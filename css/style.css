@@ -516,7 +516,9 @@ section.active-section {
         padding: 0.9rem 1rem;
         margin-top: 0.5rem;
     }
-
+ .cta-button{
+    width: 100%;
+ }
     .setup-grid-container {
         grid-template-columns: 1fr;
         gap: 1rem;
