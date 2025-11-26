@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let exclusions = []; // Array of { giver: "Name", receiver: "Name" }
     let generatedPairs = [];
     let currentPassIndex = 0;
+    // Pagination state for participants list
+    let currentPage = 1;
+    let pageSize = 50;
 
     // DOM Elements
     const sections = {
@@ -133,6 +136,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Export handlers
+    const exportJSONBtn = document.getElementById('export-json-btn');
+    const exportCSVBtn = document.getElementById('export-csv-btn');
+
+    function downloadBlob(filename, content, type){
+        const blob = new Blob([content], { type });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    }
+
+    function exportJSON(){
+        if (!generatedPairs || generatedPairs.length === 0) { alert('No results to export.'); return; }
+        const content = JSON.stringify(generatedPairs, null, 2);
+        downloadBlob('secret-santa-results.json', content, 'application/json');
+    }
+
+    function exportCSV(){
+        if (!generatedPairs || generatedPairs.length === 0) { alert('No results to export.'); return; }
+        const header = 'Giver,Receiver\n';
+        const rows = generatedPairs.map(p => `"${p.giver.replace(/"/g, '""')}","${p.receiver.replace(/"/g, '""') }"`).join('\n');
+        downloadBlob('secret-santa-results.csv', header + rows, 'text/csv');
+    }
+
+    exportJSONBtn && exportJSONBtn.addEventListener('click', exportJSON);
+    exportCSVBtn && exportCSVBtn.addEventListener('click', exportCSV);
+
     if (buttons.reset) {
         buttons.reset.addEventListener('click', () => {
             // Force reset of display properties to ensure Hero is visible
@@ -184,6 +219,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Keyboard shortcuts for pass-device mode: Enter to reveal, Space to move next
+    document.addEventListener('keydown', (e) => {
+        const activeInput = document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.isContentEditable);
+        if (activeInput) return; // avoid interfering while typing
+
+        if (views.pass.classList.contains('active-view')){
+            if (e.key === 'Enter') {
+                // Reveal
+                if (!passElements.step2.classList.contains('hidden-step')) return;
+                buttons.reveal && buttons.reveal.click();
+            }
+            if (e.key === ' ' || e.key === 'Spacebar') {
+                e.preventDefault();
+                // Next person
+                if (buttons.nextPerson) buttons.nextPerson.click();
+            }
+        }
+    });
+
     // Pass Mode Controls
     if (buttons.reveal) {
         buttons.reveal.addEventListener('click', () => {
@@ -210,6 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const storedParticipants = localStorage.getItem('secret_santa_participants');
         if (storedParticipants) {
             participants = JSON.parse(storedParticipants);
+            currentPage = 1;
             renderParticipants();
             updateDrawButton();
             updateExclusionDropdowns();
@@ -231,7 +286,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = inputs.name.value.trim();
         if (!name) return;
 
-        if (participants.includes(name)) {
+        // Case-insensitive duplicate check
+        const exists = participants.some(p => p.toLowerCase() === name.toLowerCase());
+        if (exists) {
             alert('Name already exists!');
             return;
         }
@@ -250,7 +307,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let addedCount = 0;
         names.forEach(name => {
-            if (!participants.includes(name)) {
+            // case-insensitive check
+            const exists = participants.some(p => p.toLowerCase() === name.toLowerCase());
+            if (!exists) {
                 participants.push(name);
                 addedCount++;
             }
@@ -285,15 +344,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderParticipants() {
         lists.participants.innerHTML = '';
-        participants.forEach((name, index) => {
+        // Pagination
+        const total = participants.length;
+        const totalPages = Math.max(1, Math.ceil(total / pageSize));
+        if (currentPage > totalPages) currentPage = totalPages;
+        const start = (currentPage - 1) * pageSize;
+        const end = Math.min(total, start + pageSize);
+        const displayStart = total === 0 ? 0 : start + 1;
+        const displayEnd = total === 0 ? 0 : end;
+
+        for (let i = start; i < end; i++){
+            const name = participants[i];
             const li = document.createElement('li');
             li.className = 'list-item';
+            // store absolute index
             li.innerHTML = `
                 <span>${name}</span>
-                <button class="delete-btn" data-index="${index}">&times;</button>
+                <button class="delete-btn" data-index="${i}">&times;</button>
             `;
             lists.participants.appendChild(li);
-        });
+        }
+
+        // Update pagination info
+        const info = document.getElementById('pagination-info');
+        if (info) info.textContent = `Showing ${displayStart}-${displayEnd} of ${total}`;
+
+        // Update prev/next disabled state
+        const prev = document.getElementById('page-prev');
+        const next = document.getElementById('page-next');
+        if (prev) prev.disabled = currentPage <= 1;
+        if (next) next.disabled = currentPage >= totalPages;
 
         document.querySelectorAll('#participants-list .delete-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -302,6 +382,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // Pagination controls
+    const pagePrevBtn = document.getElementById('page-prev');
+    const pageNextBtn = document.getElementById('page-next');
+    const pageSizeSelect = document.getElementById('page-size');
+    if (pagePrevBtn) pagePrevBtn.addEventListener('click', () => { if (currentPage>1){ currentPage--; renderParticipants(); }});
+    if (pageNextBtn) pageNextBtn.addEventListener('click', () => { currentPage++; renderParticipants(); });
+    if (pageSizeSelect) pageSizeSelect.addEventListener('change', (e) => { pageSize = parseInt(e.target.value,10); currentPage = 1; renderParticipants(); });
 
     function updateExclusionDropdowns() {
         const populate = (select) => {
@@ -365,49 +453,8 @@ document.addEventListener('DOMContentLoaded', () => {
         buttons.draw.disabled = participants.length < 3;
     }
 
-    function generatePairs(names, exclusions) {
-        let shuffled = [...names];
-        let valid = false;
-        let attempts = 0;
-        const maxAttempts = 500;
-
-        while (!valid && attempts < maxAttempts) {
-            // Fisher-Yates shuffle
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-            }
-
-            valid = true;
-            for (let i = 0; i < names.length; i++) {
-                const giver = names[i];
-                const receiver = shuffled[i];
-
-                // Check self-match
-                if (giver === receiver) {
-                    valid = false;
-                    break;
-                }
-
-                // Check exclusions
-                const isExcluded = exclusions.some(ex => ex.giver === giver && ex.receiver === receiver);
-                if (isExcluded) {
-                    valid = false;
-                    break;
-                }
-            }
-            attempts++;
-        }
-
-        if (!valid) {
-            throw new Error("Could not find a valid matching. Try removing some exclusions.");
-        }
-
-        return names.map((giver, i) => ({
-            giver,
-            receiver: shuffled[i]
-        }));
-    }
+    // Use the deterministic backtracking pairer provided in js/pairing.js (exposed as generatePairs)
+    // pairing.js will throw an Error with guidance when no valid matching exists.
 
     // Results Display
     function displayResultsList(pairs) {
@@ -433,6 +480,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             lists.resultsGrid.appendChild(card);
         });
+        // Store for exports
+        generatedPairs = pairs;
     }
 
     // Pass Mode Logic

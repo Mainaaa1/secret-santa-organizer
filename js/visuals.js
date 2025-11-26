@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {
         console.error("Vanta JS failed to load", e);
         // Fallback to CSS gradient if JS fails
-        document.getElementById('canvas-container').style.background = 'linear-gradient(to bottom, #0a192f, #112240)';
+        const el = document.getElementById('canvas-container');
+        if (el) el.style.background = 'linear-gradient(to bottom, #0a192f, #112240)';
     }
 });

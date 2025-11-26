@@ -1,0 +1,12 @@
+{
+  "name": "project-2-secret-santa",
+  "version": "1.0.0",
+  "description": "Static Secret Santa organizer",
+  "scripts": {
+    "start": "npx http-server -p 8000",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  }
+}

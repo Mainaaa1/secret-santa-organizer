@@ -7,17 +7,8 @@
     --glass-border: rgba(230, 241, 255, 0.1);
     --font-main: 'Outfit', sans-serif;
     --transition-speed: 0.4s;
-}
-
-:root {
-    --bg-color: #0a192f;
-    --text-primary: #e6f1ff;
-    --text-secondary: #8892b0;
-    --accent-color: #64ffda;
-    --glass-bg: rgba(10, 25, 47, 0.7);
-    --glass-border: rgba(230, 241, 255, 0.1);
-    --font-main: 'Outfit', sans-serif;
-    --transition-speed: 0.4s;
+    --nav-height: 64px;
+    --nav-gap: 12px; /* visual gap under fixed navbar */
 }
 
 * {
@@ -30,12 +21,12 @@ body {
     font-family: var(--font-main);
     background-color: var(--bg-color);
     color: var(--text-primary);
-    overflow: hidden;
-    /* Prevent body scroll */
-    height: 100vh;
+    /* Allow page scrolling on desktop and smaller devices */
+    overflow: auto;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
 }
 
 #canvas-container {
@@ -51,9 +42,11 @@ body {
 .app-container {
     width: 95%;
     max-width: 1200px;
-    /* Wider for desktop grid */
-    height: 90vh;
+    /* Constrain height so the inner scroll works when lists are long */
+    margin-bottom: 40px;
     padding: 2rem;
+    /* Ensure content sits below the fixed navbar and has a small gap */
+    margin-top: calc(var(--nav-height) + var(--nav-gap));
     z-index: 1;
     position: relative;
     background: rgba(10, 25, 47, 0.4);
@@ -63,11 +56,10 @@ body {
     border: 1px solid var(--glass-border);
     display: flex;
     flex-direction: column;
-    justify-content: center;
 }
 
 .content-wrapper {
-    height: 100%;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -251,7 +243,7 @@ textarea {
 .list-container {
     list-style: none;
     margin-bottom: 2rem;
-    max-height: 50vh;
+    max-height: 40vh;
     /* Taller on desktop */
     overflow-y: auto;
     background: rgba(0, 0, 0, 0.2);
@@ -489,225 +481,40 @@ section.active-section {
 }
 
 /* Exclusions */
-.exclusions-wrapper {
-    margin-top: 1rem;
-    border-top: 1px solid var(--glass-border);
-    padding-top: 1rem;
-}
-
-.instruction-text {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
-}
-
-.exclusion-controls {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.exclusion-controls span {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-}
-
-/* Sections & Transitions */
-section {
-    display: none;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    height: 100%;
-    /* Full height for grid */
-}
-
-section.active-section {
-    display: block;
-    opacity: 1;
-    animation: fadeIn 0.8s ease forwards;
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.fade-in {
-    opacity: 0;
-    animation: fadeIn 0.8s ease forwards;
-}
-
-.delay-1 {
-    animation-delay: 0.2s;
-}
-
-.delay-2 {
-    animation-delay: 0.4s;
-}
-
-/* Results - View Controls */
-.view-controls {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.toggle-btn {
-    background: transparent;
-    border: 1px solid var(--text-secondary);
-    color: var(--text-secondary);
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    transition: all 0.3s;
-}
-
-.toggle-btn.active {
-    border-color: var(--accent-color);
-    color: var(--bg-color);
-    background: var(--accent-color);
-}
-
-.results-view {
-    display: none;
-}
-
-.results-view.active-view {
-    display: block;
-    animation: fadeIn 0.5s ease;
-}
-
-/* Results - Grid */
-/* Results - Grid */
-.cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.5rem;
-    padding: 1rem;
-}
-
-.result-card {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 1.5rem;
-    border-radius: 8px;
-    border: 1px solid var(--glass-border);
-    text-align: center;
-    position: relative;
-    transition: transform 0.3s;
-}
-
-.result-card:hover {
-    transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.08);
-}
-
-.giver {
-    display: block;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
-}
-
-.receiver {
-    display: block;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--accent-color);
-}
-
-.copy-btn {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    font-size: 0.8rem;
-    opacity: 0.5;
-}
-
-.copy-btn:hover {
-    opacity: 1;
-    color: var(--accent-color);
-}
-
-/* Pass Device Mode */
-.pass-card {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 3rem 2rem;
-    border-radius: 12px;
-    border: 1px solid var(--glass-border);
-    text-align: center;
-    min-height: 300px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.pass-step {
-    width: 100%;
-}
-
-.hidden-step {
-    display: none;
-}
-
-.reveal-text {
-    font-size: 2.5rem;
-    color: var(--accent-color);
-    margin: 1.5rem 0;
-    font-weight: 700;
-}
-
-.small-text {
-    color: var(--text-secondary);
-    font-size: 1rem;
-}
-
-.actions-footer {
-    margin-top: 2rem;
-    text-align: center;
-}
+/* Consolidated duplicate blocks removed to reduce size and improve maintainability */
 
 /* Responsive */
 @media (max-width: 768px) {
+    body {
+        overflow: auto;
+        height: auto;
+        align-items: flex-start;
+        padding-top: 1rem;
+    }
+
     .app-container {
         width: 100%;
-        height: 100%;
+        min-height: 100vh;
         border-radius: 0;
         border: none;
         padding: 1rem;
     }
 
     h1.title {
-        font-size: 3rem;
+        font-size: 2.2rem;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Make CTA buttons more usable on mobile */
+    .cta-button,
+    .text-button {
+        display: block;
+        padding: 0.9rem 1rem;
+        margin-top: 0.5rem;
     }
 
     .setup-grid-container {
@@ -722,4 +529,98 @@ section.active-section {
     .list-container {
         max-height: 300px;
     }
+
+    /* Results grid collapse to single column on mobile */
+    .cards-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 0.5rem;
+    }
+}
+
+/* HERO (landing) specific layout */
+#hero-section .content-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+}
+
+#hero-section .title {
+    margin-bottom: 0.5rem;
+}
+
+#hero-section .subtitle {
+    margin-bottom: 1.5rem;
+}
+
+/* Results grid (desktop) */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+}
+
+/* Site navbar */
+.site-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--nav-height);
+    background: rgba(6, 15, 30, 0.6);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid rgba(230,241,255,0.04);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+}
+
+.site-nav .nav-inner {
+    width: 95%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-logo { display: inline-flex; align-items: center; gap: 0.6rem; text-decoration: none; color: var(--text-primary); }
+.nav-logo .nav-title { font-weight: 700; font-size: 1.05rem; }
+
+.nav-actions { display: flex; gap: 0.5rem; align-items: center; }
+
+/* Make nav smaller on mobile */
+@media (max-width: 480px){
+    :root{ --nav-height: 56px; }
+    /* Keep the title visible on mobile; reduce size slightly */
+    .nav-logo .nav-title{ display: inline; font-size: 0.95rem; }
+    .site-nav .nav-inner{ width: 94%; }
+}
+
+/* Pagination controls */
+.pagination-controls { display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem; }
+.pagination-info { color: var(--text-secondary); font-size: 0.9rem; }
+.pagination-buttons { display:flex; align-items:center; gap:0.5rem; }
+.pagination-buttons select { background: rgba(255,255,255,0.03); color: var(--text-primary); border: 1px solid var(--glass-border); padding: 0.4rem; border-radius:4px; }
+
+/* Make pagination responsive and touch-friendly */
+.pagination-controls { gap: 0.5rem; flex-wrap: wrap; }
+.pagination-buttons .icon-button { min-width: 40px; min-height: 36px; }
+
+@media (max-width: 600px) {
+    .pagination-controls { flex-direction: column; align-items: stretch; }
+    .pagination-info { margin-bottom: 0.5rem; }
+    .pagination-buttons { justify-content: space-between; width: 100%; }
+    .pagination-buttons select { margin-left: 8px; }
+}
+
+/* Prevent cards from forcing horizontal overflow and improve responsiveness */
+.cards-grid { box-sizing: border-box; width: 100%; align-items: start; }
+.result-card { min-width: 0; word-break: break-word; overflow: hidden; display: flex; flex-direction: column; }
+
+@media (min-width: 1024px) {
+    .app-container { padding-left: 2rem; padding-right: 2rem; }
 }
