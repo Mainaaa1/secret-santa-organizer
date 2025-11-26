@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secret Santa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div id="canvas-container"></div>
+
+    <main class="app-container">
+        <!-- Section 1: Hero / Landing -->
+        <section id="hero-section" class="active-section">
+            <div class="content-wrapper">
+                <h1 class="title fade-in">Secret Santa</h1>
+                <p class="subtitle fade-in delay-1">Organize your holiday exchange with elegance.</p>
+                <button id="start-btn" class="cta-button fade-in delay-2">Start Exchange</button>
+            </div>
+        </section>
+
+        <!-- Section 2: Participants Setup -->
+        <section id="setup-section" class="hidden-section">
+            <div class="content-wrapper">
+                <h2 class="section-title">Participants</h2>
+
+                <div class="setup-grid-container">
+                    <!-- Left Column: Inputs -->
+                    <div class="setup-left-col">
+                        <div class="input-group">
+                            <input type="text" id="participant-name" placeholder="Enter name..." autocomplete="off">
+                            <button id="add-btn" class="icon-button">+</button>
+                        </div>
+
+                        <div class="text-right">
+                            <button id="toggle-import-btn" class="text-button small">Bulk Import</button>
+                        </div>
+
+                        <div id="import-area" class="hidden-area">
+                            <textarea id="import-text" placeholder="Paste names here (one per line)..."></textarea>
+                            <button id="import-btn" class="cta-button small">Import Names</button>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: List & Exclusions -->
+                    <div class="setup-right-col">
+                        <ul id="participants-list" class="list-container">
+                            <!-- List items will be injected here -->
+                        </ul>
+
+                        <div class="exclusions-wrapper">
+                            <button id="toggle-exclusions-btn" class="text-button small">Manage Exclusions</button>
+                            <div id="exclusions-area" class="hidden-area">
+                                <p class="instruction-text">Select a person, then select who they CANNOT draw.</p>
+                                <div class="exclusion-controls">
+                                    <select id="exclusion-giver"></select>
+                                    <span>cannot draw</span>
+                                    <select id="exclusion-receiver"></select>
+                                    <button id="add-exclusion-btn" class="icon-button small">+</button>
+                                </div>
+                                <ul id="exclusions-list" class="list-container small-list"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button id="draw-btn" class="cta-button secondary" disabled>Draw Names</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Results / Reveal -->
+        <section id="result-section" class="hidden-section">
+            <div class="content-wrapper">
+                <h2 class="section-title">Santa Has Spoken</h2>
+
+                <!-- Toggle between List View and Pass Mode -->
+                <div class="view-controls">
+                    <button id="view-list-btn" class="toggle-btn active">List View</button>
+                    <button id="view-pass-btn" class="toggle-btn">Pass Device</button>
+                </div>
+
+                <!-- List View Container -->
+                <div id="results-list-container" class="results-view active-view">
+                    <div id="results-grid" class="cards-grid">
+                        <!-- Result cards injected here -->
+                    </div>
+                </div>
+
+                <!-- Pass Device Container -->
+                <div id="pass-device-container" class="results-view hidden-view">
+                    <div id="pass-card" class="pass-card">
+                        <div class="pass-step step-1">
+                            <p style="padding: 10px;">Pass the device to this person.</p>
+                            <h2 style="padding: 10px;" id="current-player-name">Player Name</h2>
+                            <button id="reveal-btn" class="cta-button">Reveal Target</button>
+                        </div>
+                        <div class="pass-step step-2 hidden-step">
+                            <p class="small-text">You are the Secret Santa for:</p>
+                            <h2 id="target-name" class="reveal-text">Target Name</h2>
+                            <button id="next-person-btn" class="cta-button secondary">Okay, Next Person</button>
+                        </div>
+                        <div class="pass-step step-3 hidden-step">
+                            <h2>All Done!</h2>
+                            <p>Everyone has seen their match.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions-footer">
+                    <button id="reset-btn" class="text-button">Start Over</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.waves.min.js"></script>
+    <script src="js/visuals.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
